@@ -1,7 +1,8 @@
 import { Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { AngularFireAuth } from '@angular/fire/auth'
+import { AngularFireAuth } from '@angular/fire/auth';
+import { UIService } from '../shared/ui.service';
 
 import { AuthData } from "./auth-data.model";
 import { TrainingService } from '../training/training.service';
@@ -15,7 +16,8 @@ export class AuthService {
 
     constructor(private router:Router,
          private afAuth: AngularFireAuth,
-         private trainingService: TrainingService
+         private trainingService: TrainingService,
+         private uiService: UIService
          ) {}
 
     initAuthListener() {
@@ -34,18 +36,28 @@ export class AuthService {
     }     
 
     registerUser(authData: AuthData) {
+        this.uiService.LoadingStateChanged.next(true)
         this.afAuth.createUserWithEmailAndPassword(authData.email, authData.password)
         .then(result => {
+            this.uiService.LoadingStateChanged.next(false)
         })
-        .catch(er => console.log(er))
+        .catch(er => {
+            this.uiService.LoadingStateChanged.next(false)
+            this.uiService.showSnackBar(er.message,null,3000)
+        })
        
     }
 
     login(authData: AuthData) {
+        this.uiService.LoadingStateChanged.next(true)
         this.afAuth.signInWithEmailAndPassword(authData.email, authData.password)
         .then(result => {
+            this.uiService.LoadingStateChanged.next(false)
         })
-        .catch(er => console.log(er))
+        .catch(er => {
+            this.uiService.LoadingStateChanged.next(false)
+            this.uiService.showSnackBar(er.message,null,3000)
+        })
     }
 
     logout() {
