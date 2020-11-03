@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 
 import { AuthService } from '../auth.service';
@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss']
 })
-export class SignupComponent implements OnInit {
+export class SignupComponent implements OnInit, OnDestroy {
   maxDate;
   isLoading = false;
   loadingSubs: Subscription;
@@ -28,5 +28,11 @@ export class SignupComponent implements OnInit {
 
   onSubmit(form: NgForm) {
     this.authService.registerUser({...form.value})
+  }
+
+  ngOnDestroy() {
+    if (this.loadingSubs) {
+      this.loadingSubs.unsubscribe()
+    }
   }
 }
